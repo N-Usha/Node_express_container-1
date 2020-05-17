@@ -5,8 +5,8 @@ on:
         
 
 env:
-  AZURE_RESOURCE_GROUP: ActionsDemo   # set this to your Azure Resource group's name  
-  AZURE_WEBAPP_NAME: AppWithContainer   # set this to your application's name
+  AZURE_RESOURCE_GROUP: Gopi-RG   # set this to your Azure Resource group's name  
+  AZURE_WEBAPP_NAME: nodejsapp-container   # set this to your application's name
   AZURE_APP_PLAN: ActionPlan  # set this to your App service plan's name - Needed only if you are provisioning the app in the workflow
   CONTAINER_REGISTRY: ${{ secrets.REGISTRY_USERNAME }}.azurecr.io   # set secret with Container Registry name
 
@@ -30,6 +30,10 @@ jobs:
     #needs: provision-webapp
     runs-on: ubuntu-latest
     steps:
+    - name: Azure authentication
+      uses: azure/login@v1
+      with:
+          creds: ${{ secrets.AZURE_CREDENTIALS_APP }}  
     - name: 'Deploy to Azure Web App for Container'   
       uses: azure/webapps-deploy@v2
       with: 
