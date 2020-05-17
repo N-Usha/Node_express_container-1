@@ -2,17 +2,45 @@ name: Build
 
 on: push
 
-jobs:
-  build:
+# CONFIGURATION
+# For help, go to https://github.com/Azure/Actions
+#
+# Set up the following secrets in your repository:
+#   AZURE_CREDENTIALS, REGISTRY_USERNAME, REGISTRY_PASSWORD
+# 2. Change these variables for your configuration:
+env:
+  AZURE_RESOURCE_GROUP: ActionsDemo   # set this to your Azure Resource group's name  
+  AZURE_WEBAPP_NAME: AppWithContainer   # set this to your application's name
+  AZURE_APP_PLAN: ActionPlan  # set this to your App service plan's name - Needed only if you are provisioning the app in the workflow
+  CONTAINER_REGISTRY: ${{ secrets.REGISTRY_USERNAME }}.azurecr.io   # set secret with Container Registry name
+
+jobs:  build-image:
+  build-image:
+    #needs: provision-webapp
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Azure authentication
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS  }}
+    - name: ACR authentication
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ env.CONTAINER_REGISTRY }}
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}    
+    - name: Docker Build & Push to ACR
+      run: |
+        docker build . -t ${{ env.CONTAINER_REGISTRY }}/nodejsapp:${{ github.sha }}
+        docker push ${{ env.CONTAINER_REGISTRY }}/nodejsapp:${{ github.sha }}
+    - name: Run tests
+      run:
+      
+        
+  approval:
     runs-on: windows-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Install dependencies
-      run: echo install dependencies
-    - name: Build
-      run: echo Execute build
-    - name: Run tests
-      run: echo test execution
     - name: Login via Az module
       uses: azure/login@v1.1
       with:
