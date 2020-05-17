@@ -14,7 +14,7 @@ env:
   AZURE_APP_PLAN: ActionPlan  # set this to your App service plan's name - Needed only if you are provisioning the app in the workflow
   CONTAINER_REGISTRY: ${{ secrets.REGISTRY_USERNAME }}.azurecr.io   # set secret with Container Registry name
 
-jobs:  build-image:
+jobs:
   build-image:
     #needs: provision-webapp
     runs-on: ubuntu-latest
@@ -35,8 +35,8 @@ jobs:  build-image:
         docker build . -t ${{ env.CONTAINER_REGISTRY }}/nodejsapp:${{ github.sha }}
         docker push ${{ env.CONTAINER_REGISTRY }}/nodejsapp:${{ github.sha }}
     - name: Run tests
-      run:
-      
+      run: |
+        echo "Running tests"
         
   approval:
     runs-on: windows-latest
